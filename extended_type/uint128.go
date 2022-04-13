@@ -325,6 +325,17 @@ func (u Uint128) PutBytes(b []byte) {
 	binary.LittleEndian.PutUint64(b[8:], u.Hi)
 }
 
+// ToBytes transform Uint128 to byte slice
+func (u *Uint128) ToBytes() []byte {
+	r := make([]byte, 0, 16)
+	partSlice := make([]byte, 8)
+	binary.LittleEndian.PutUint64(partSlice, u.Lo)
+	r = append(r, partSlice...)
+	binary.LittleEndian.PutUint64(partSlice, u.Hi)
+	r = append(r, partSlice...)
+	return r
+}
+
 // Big returns u as a *big.Int.
 func (u Uint128) Big() *big.Int {
 	i := new(big.Int).SetUint64(u.Hi)

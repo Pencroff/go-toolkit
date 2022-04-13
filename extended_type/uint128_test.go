@@ -3,16 +3,23 @@ package extended_type
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"github.com/stretchr/testify/assert"
+	"log"
 	"math/big"
 	"testing"
 )
 
-func randUint128() Uint128 {
-	randBuf := make([]byte, 16)
-	_, err := rand.Read(randBuf)
+func getRandBuffer(size int) []byte {
+	buf := make([]byte, size)
+	_, err := rand.Read(buf)
 	if err != nil {
-		return Uint128{}
+		log.Fatal(err)
 	}
+	return buf
+}
+
+func randUint128() Uint128 {
+	randBuf := getRandBuffer(16)
 	return FromBytes(randBuf)
 }
 
@@ -289,4 +296,35 @@ func TestString(t *testing.T) {
 	if _, err := FromString("340282366920938463463374607431768211456"); err == nil {
 		t.Fatal("expected error when parsing max+1")
 	}
+}
+
+func TestToBytes(t *testing.T) {
+	rndOut := getRandBuffer(16)
+
+	tbl := []struct {
+		in  Uint128
+		out []byte
+	}{
+		{
+			in:  ZeroUint128,
+			out: make([]byte, 16),
+		},
+		{
+			in:  New(0xff, 0xff),
+			out: []byte{0xff, 0, 0, 0, 0, 0, 0, 0, 0xff, 0, 0, 0, 0, 0, 0, 0},
+		},
+		{
+			in:  FromBytes(rndOut),
+			out: rndOut,
+		},
+	}
+
+	for _, el := range tbl {
+		expected := el.out
+		res := el.in.ToBytes()
+		assert.Equal(t, expected, res,
+			"incorrect byte slice\nexpected: %v\n!=\nresult  : %v\n",
+			expected, res)
+	}
+
 }
