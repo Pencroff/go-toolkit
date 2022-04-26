@@ -11,6 +11,9 @@ func TestInterfaceSlice(t *testing.T) {
 	res := InterfaceSlice(nil)
 	assert.Equal(t, []interface{}(nil), res)
 	assert.Equal(t, 0, len(res))
+	res = InterfaceSlice([]string{})
+	assert.Equal(t, []interface{}{}, res)
+	assert.Equal(t, 0, len(res))
 	strSlice = append(strSlice, "a", "b")
 	assert.Equal(t, strSlice, InterfaceSlice([]string{"a", "b"}))
 	var boolSlice []interface{}
